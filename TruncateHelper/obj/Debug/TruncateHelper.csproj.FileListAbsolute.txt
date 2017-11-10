@@ -1,0 +1,14 @@
+C:\Users\Administrator\Desktop\TruncateHelper\TruncateHelper\TruncateHelper\bin\Debug\TruncateHelper.exe.config
+C:\Users\Administrator\Desktop\TruncateHelper\TruncateHelper\TruncateHelper\bin\Debug\TruncateHelper.exe
+C:\Users\Administrator\Desktop\TruncateHelper\TruncateHelper\TruncateHelper\bin\Debug\TruncateHelper.pdb
+C:\Users\Administrator\Desktop\TruncateHelper\TruncateHelper\TruncateHelper\bin\Debug\Oracle.ManagedDataAccess.dll
+C:\Users\Administrator\Desktop\TruncateHelper\TruncateHelper\TruncateHelper\obj\Debug\TruncateHelper.Form1.resources
+C:\Users\Administrator\Desktop\TruncateHelper\TruncateHelper\TruncateHelper\obj\Debug\TruncateHelper.Properties.Resources.resources
+C:\Users\Administrator\Desktop\TruncateHelper\TruncateHelper\TruncateHelper\obj\Debug\TruncateHelper.csproj.GenerateResource.Cache
+C:\Users\Administrator\Desktop\TruncateHelper\TruncateHelper\TruncateHelper\obj\Debug\TruncateHelper.exe
+C:\Users\Administrator\Desktop\TruncateHelper\TruncateHelper\TruncateHelper\obj\Debug\TruncateHelper.pdb
+C:\Users\Administrator\Desktop\TruncateHelper\TruncateHelper\TruncateHelper\bin\Debug\TruncateHelper.exe.manifest
+C:\Users\Administrator\Desktop\TruncateHelper\TruncateHelper\TruncateHelper\bin\Debug\TruncateHelper.application
+C:\Users\Administrator\Desktop\TruncateHelper\TruncateHelper\TruncateHelper\obj\Debug\TruncateHelper.csprojResolveAssemblyReference.cache
+C:\Users\Administrator\Desktop\TruncateHelper\TruncateHelper\TruncateHelper\obj\Debug\TruncateHelper.exe.manifest
+C:\Users\Administrator\Desktop\TruncateHelper\TruncateHelper\TruncateHelper\obj\Debug\TruncateHelper.application

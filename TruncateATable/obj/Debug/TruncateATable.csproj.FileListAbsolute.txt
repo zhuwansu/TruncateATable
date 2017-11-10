@@ -1,0 +1,8 @@
+C:\Users\18410\Desktop\TruncateHelper\TruncateATable\obj\Debug\TruncateATable.csproj.CoreCompileInputs.cache
+C:\Users\18410\Desktop\TruncateHelper\TruncateATable\bin\Debug\TruncateATable.dll.config
+C:\Users\18410\Desktop\TruncateHelper\TruncateATable\bin\Debug\TruncateATable.dll
+C:\Users\18410\Desktop\TruncateHelper\TruncateATable\bin\Debug\TruncateATable.pdb
+C:\Users\18410\Desktop\TruncateHelper\TruncateATable\bin\Debug\Oracle.ManagedDataAccess.dll
+C:\Users\18410\Desktop\TruncateHelper\TruncateATable\obj\Debug\TruncateATable.dll
+C:\Users\18410\Desktop\TruncateHelper\TruncateATable\obj\Debug\TruncateATable.pdb
+C:\Users\18410\Desktop\TruncateHelper\TruncateATable\obj\Debug\TruncateATable.csprojResolveAssemblyReference.cache
