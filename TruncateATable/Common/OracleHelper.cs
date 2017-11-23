@@ -1,28 +1,3 @@
-/****************************************************************************
-*Copyright (c) 2017  All Rights Reserved.
-*CLR版本： 4.0.30319.42000
-*机器名称：ZHUWANSU
-*公司名称：
-*命名空间：TruncateATable.GetSQL
-*文件名：  OracleHelp
-*版本号：  V1.0.0.0
-*唯一标识：2f6f98a8-9884-49b9-adc0-3b2c9314baf5
-*当前的用户域：ZHUWANSU
-*创建人：  朱皖苏
-*电子邮箱：zhuwansu@dbgo.com
-*创建时间：2017/11/17 11:11:15
-
-*描述：
-*
-*=====================================================================
-*修改标记
-*修改时间：2017/11/17 11:11:15
-*修改人： 朱皖苏
-*版本号： V1.0.0.0
-*描述：
-*
-*****************************************************************************/
-
 using Oracle.ManagedDataAccess.Client;
 using System;
 using System.Collections;
@@ -36,7 +11,7 @@ namespace TruncateATable.Common
     /// <summary>
     /// A helper class used to execute queries against an Oracle database
     /// </summary>
-    public partial class OracleHelper
+    public abstract class OracleHelper
     {
 
         // Read the connection strings from the configuration file
@@ -70,7 +45,6 @@ namespace TruncateATable.Common
                 return val;
             }
         }
-
         public static DataSet ExecuteDataSet(string connStr, string SQL)
         {
             DataSet ds = null;
@@ -98,7 +72,6 @@ namespace TruncateATable.Common
             }
             return functionReturnValue;
         }
-
         /// <summary>
         /// Execute an OracleCommand (that returns no resultset) against an existing database transaction
         /// using the provided parameters.
@@ -149,6 +122,7 @@ namespace TruncateATable.Common
         /// Execute a select query that will return a result set
         /// </summary>
         /// <param name="connString">Connection string</param>
+        //// <param name="commandType">the CommandType (stored procedure, text, etc.)</param>
         /// <param name="commandText">the stored procedure name or PL/SQL command</param>
         /// <param name="commandParameters">an array of OracleParamters used to execute the command</param>
         /// <returns></returns>
@@ -440,7 +414,6 @@ namespace TruncateATable.Common
             }
             return iResult;
         }
-
         /// <summary>
         /// 批量插入数据
         /// </summary>

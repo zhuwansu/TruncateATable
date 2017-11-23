@@ -1,29 +1,4 @@
-﻿/****************************************************************************
-*Copyright (c) 2017  All Rights Reserved.
-*CLR版本： 4.0.30319.42000
-*机器名称：ZHUWANSU
-*公司名称：
-*命名空间：TruncateATable.GetSQL
-*文件名：  OracleHelp
-*版本号：  V1.0.0.0
-*唯一标识：2f6f98a8-9884-49b9-adc0-3b2c9314baf5
-*当前的用户域：ZHUWANSU
-*创建人：  朱皖苏
-*电子邮箱：zhuwansu@dbgo.com
-*创建时间：2017/11/17 11:11:15
-
-*描述：
-*
-*=====================================================================
-*修改标记
-*修改时间：2017/11/17 11:11:15
-*修改人： 朱皖苏
-*版本号： V1.0.0.0
-*描述：
-*
-*****************************************************************************/
-
-using System;
+﻿using System;
 using System.Data;
 using System.Linq;
 using TruncateATable.Common;
@@ -41,17 +16,15 @@ namespace TruncateATable
         /// </summary>
         public string Log { get; set; }
 
-        public OracleHelper OracleHelper { get; set; } = new OracleHelper();
+        /// <summary>
+        /// 记录步骤的方法
+        /// </summary>
+        public Action<string> LogAction { get; set; }
 
         /// <summary>
         /// 连接字符串
         /// </summary>
         public string Connstr { get; set; }
-
-        /// <summary>
-        /// 记录步骤的方法
-        /// </summary>
-        public Action<string> LogAction { get; set; }
 
         #endregion
 
@@ -66,10 +39,257 @@ namespace TruncateATable
 
         #endregion
 
+        #region Common-Sql
+        /// <summary>
+        /// 获取 清除数据 的sql
+        /// </summary>
+        /// <param name="tableName">表名</param>
+        /// <returns>清除某张表数据的sql</returns>
+        public string GetTruncateTableSql(string tableName)
+        {
+            return $@"truncate table {tableName} ";
+        }
+
+        /// <summary>
+        /// 获取 查询主键 的sql
+        /// </summary>
+        /// <param name="tableName">表名</param>
+        /// <returns>查询 OWNER、CONSTRAINT_NAME、TABLE_NAME、COLUMN_NAME、POSITION 的SQL</returns>
+        public string GetPrimaryKeySql(string tableName)
+        {
+            string sql = $@" select cu.* from user_cons_columns cu, user_constraints au where cu.constraint_name = au.constraint_name and au.constraint_type = 'P' and au.table_name = '{tableName.ToUpper()}' ";
+            return sql;
+        }
+
+        /// <summary>
+        /// 获取 查询外键 的sql 取R_CONSTRAINT_NAME
+        /// </summary>
+        /// <param name="tableName">表名</param>
+        /// <param name="PkeyName">外键名</param>
+        /// <returns></returns>
+        public string GetForeignKeySql(string tableName, string PkeyName)
+        {
+            string sql = $@"select * from user_constraints a where a.constraint_type = 'R'  and a.table_name = '{tableName}' and a.R_CONSTRAINT_NAME='{PkeyName}'";
+            return sql;
+        }
+
+        /// <summary>
+        /// 获取 被引用的表和依赖列名 的Sql
+        /// </summary>
+        /// <param name="PKeyName">主键名</param>
+        /// <returns>查询 TABLE_NAME、COLUMN_NAME 的SQL</returns>
+        public string GetRefKeySql(string PKeyName)
+        {
+            string sql = $@"select b.table_name,b.column_name from user_constraints a inner join user_cons_columns b on a.constraint_name = b.constraint_name where a.r_constraint_name='{PKeyName.ToUpper()}'";
+            return sql;
+        }
+
+
+        /// <summary>
+        /// 获取 禁用外键 的SQL
+        /// </summary>
+        /// <param name="tableName">表名</param>
+        /// <param name="FKeyName">外键名</param>
+        /// <returns></returns>
+        public string GetDisableForeignKeySql(string tableName, string FKeyName)
+        {
+            string sql = $@"alter table {tableName.ToUpper()} disable constraint {FKeyName.ToUpper()}";
+            return sql;
+        }
+
+        /// <summary>
+        /// 获取 启用外键 的SQL
+        /// </summary>
+        /// <param name="tableName">表名</param>
+        /// <param name="FKeyName">外键名</param>
+        /// <returns></returns>
+        public string GetEnabledForeignKeySql(string tableName, string FKeyName)
+        {
+            string sql = $@"alter table {tableName.ToUpper()} enable constraint {FKeyName.ToUpper()}";
+            return sql;
+        }
+
+        public string GetDataCountSql(string tableName)
+        {
+            var sql = $"select Count(*) from {tableName}";
+            return sql;
+        }
+
+        #endregion
+
         #region Common-ExecuteSql
 
+        /// <summary>
+        /// 获取 主键  
+        /// </summary>
+        /// <param name="tableName">表名</param>
+        /// <param name="connStr">连接字符串</param>
+        /// <returns>返回主键 CONSTRAINT_NAME 值，查询不到返回null</returns>
+        public string GetPrimaryKey(string tableName, string connStr)
+        {
+            string sql = GetPrimaryKeySql(tableName);
+            DataTable dt = OracleHelper.ExecuteDataSet(connStr, sql).Tables[0];
+            var CONSTRAINT_NAME = dt.Rows?[0].Field<string>("CONSTRAINT_NAME");//主键 一张表只有一个主键
+            return CONSTRAINT_NAME;
+        }
+        /// <summary>
+        /// 获取 主键  
+        /// </summary>
+        /// <param name="tableName">表名</param>
+        /// <returns>返回主键 CONSTRAINT_NAME 值，查询不到返回null</returns>
+        public string GetPrimaryKey(string tableName)
+        {
+            if (this.Connstr == null)
+            {
+                throw new Exception("初始化连接字符串有误");
+            }
+            string sql = GetPrimaryKeySql(tableName);
+            DataTable dt = OracleHelper.ExecuteDataSet(this.Connstr, sql).Tables[0];
+            var CONSTRAINT_NAME = dt.Rows?[0].Field<string>("CONSTRAINT_NAME");//主键 一张表只有一个主键
+            return CONSTRAINT_NAME;
+        }
+        /// <summary>
+        /// 查询外键 
+        /// </summary>
+        /// <param name="tableName">表名</param>
+        /// <param name="PkeyName">外键名</param>
+        /// <param name="connStr">连接字符串</param>
+        /// <returns>返回外键名</returns>
+        public string GetForeignKey(string tableName, string PkeyName, string connStr)
+        {
+            string sql = GetForeignKeySql(tableName, PkeyName);
+            DataTable dt = OracleHelper.ExecuteDataSet(connStr, sql).Tables[0];
+            var CONSTRAINT_NAME = dt.Rows?[0].Field<string>("CONSTRAINT_NAME");//外键 两张表一个外键关系
+            return CONSTRAINT_NAME;
+        }
+        /// <summary>
+        /// 查询外键 
+        /// </summary>
+        /// <param name="tableName">表名</param>
+        /// <param name="PkeyName">外键名</param>
+        /// <returns>返回外键名</returns>
+        public string GetForeignKey(string tableName, string PkeyName)
+        {
+            if (this.Connstr == null)
+            {
+                throw new Exception("初始化连接字符串有误");
+            }
+            string sql = GetForeignKeySql(tableName, PkeyName);
+            DataTable dt = OracleHelper.ExecuteDataSet(Connstr, sql).Tables[0];
+            var CONSTRAINT_NAME = dt.Rows?[0].Field<string>("R_CONSTRAINT_NAME");//外键 两张表一个外键关系
+            return CONSTRAINT_NAME;
+        }
 
+        /// <summary>
+        /// 获取 被引用的表   
+        /// </summary>
+        /// <param name="PKeyName">主键名</param>
+        /// <param name="connStr">连接字符串</param>
+        /// <returns>返回item1 Ref TABLE_NAME，item2 all Ref TABLE_NAME</returns>
+        public Tuple<string, string[]> GetRefKey(string PKeyName, string connStr)
+        {
+            string sql = GetRefKeySql(PKeyName);
+            DataTable dt = OracleHelper.ExecuteDataSet(connStr, sql).Tables[0];
+            var refTables = dt.Select().Select(m => m.Field<string>("TABLE_NAME")).ToArray();
+            return new Tuple<string, string[]>(string.Join(",", refTables), refTables);
+        }
 
+        /// <summary>
+        /// 获取 被引用的表   
+        /// </summary>
+        /// <param name="PKeyName">主键名</param>
+        /// <returns>返回item1 Ref TABLE_NAME，item2 all Ref TABLE_NAME</returns>
+        public Tuple<string, string[]> GetRefKey(string PKeyName)
+        {
+            if (this.Connstr == null)
+            {
+                throw new Exception("初始化连接字符串有误");
+            }
+            string sql = GetRefKeySql(PKeyName);
+            DataTable dt = OracleHelper.ExecuteDataSet(Connstr, sql).Tables[0];
+            var CONSTRAINT_NAMEs = dt.Select().Select(m => m.Field<string>("R_CONSTRAINT_NAME")).ToArray();//外键 两张表一个外键关系
+            return new Tuple<string, string[]>(string.Join(",", CONSTRAINT_NAMEs), CONSTRAINT_NAMEs);
+        }
+
+        /// <summary>
+        ///  禁用外键 
+        /// </summary>
+        /// <param name="tableName">表名</param>
+        /// <param name="FKeyName">外键名</param>
+        /// <param name="connStr">连接字符串</param>
+        /// <returns></returns>
+        public int GetDisableForeignKey(string tableName, string FKeyName, string connStr)
+        {
+            string sql = GetDisableForeignKeySql(tableName, FKeyName);
+            int i = OracleHelper.ExecuteNonQuery(connStr, CommandType.Text, sql);
+            return i;
+        }
+
+        /// <summary>
+        ///  禁用外键 
+        /// </summary>
+        /// <param name="tableName">表名</param>
+        /// <param name="FKeyName">外键名</param>
+        /// <returns></returns>
+        public int GetDisableForeignKey(string tableName, string FKeyName)
+        {
+            if (this.Connstr == null)
+            {
+                throw new Exception("初始化连接字符串有误");
+            }
+            string sql = GetDisableForeignKeySql(tableName, FKeyName);
+            int i = OracleHelper.ExecuteNonQuery(Connstr, CommandType.Text, sql);
+            return i;
+        }
+
+        /// <summary>
+        /// 获取 启用外键 的SQL
+        /// </summary>
+        /// <param name="tableName">表名</param>
+        /// <param name="FKeyName">外键名</param>
+        /// <param name="connStr">连接字符串</param>
+        /// <returns></returns>
+        public int GetEnabledForeignKey(string tableName, string FKeyName, string connStr)
+        {
+            try
+            {
+                string sql = GetEnabledForeignKeySql(tableName, FKeyName);
+                int i = OracleHelper.ExecuteNonQuery(connStr, CommandType.Text, sql);
+                return i;
+            }
+            catch
+            {
+                return 0;
+            }
+
+        }
+
+        /// <summary>
+        /// 获取 启用外键 的SQL
+        /// </summary>
+        /// <param name="tableName">表名</param>
+        /// <param name="FKeyName">外键名</param>
+        /// <returns></returns>
+        public int GetEnabledForeignKey(string tableName, string FKeyName)
+        {
+            string sql = GetEnabledForeignKeySql(tableName, FKeyName);
+            int i = OracleHelper.ExecuteNonQuery(Connstr, CommandType.Text, sql);
+            return i;
+        }
+
+        private int TruncateTable(string tableName, string connStr)
+        {
+            string sql = GetTruncateTableSql(tableName);
+            int i = OracleHelper.ExecuteNonQuery(connStr, CommandType.Text, sql);
+            return i;
+        }
+
+        public long GetDataCount(string tableName, string connStr)
+        {
+            var sql = GetDataCountSql(tableName);
+            long count = Convert.ToInt64(OracleHelper.ExecuteScalar(connStr, CommandType.Text, sql));
+            return count;
+        }
         #endregion
 
         #region Core
@@ -88,24 +308,24 @@ namespace TruncateATable
             }
             tableName = tableName.ToUpper();
             LogInfo($"准备删除表{tableName}数据");
-            var count = OracleHelper.GetDataCount(tableName, connStr);
+            var count = GetDataCount(tableName, connStr);
             if (count == 0)
             {
                 LogInfo($"表{tableName}无数据");
                 return "true";
             }
-            var pKeyName = OracleHelper.GetPrimaryKey(tableName, connStr);
+            var pKeyName = GetPrimaryKey(tableName, connStr);
             if (string.IsNullOrEmpty(pKeyName))
             {
                 LogInfo("1、表无主键请检查");
                 throw new Exception("表无主键请检查");
             }
             LogInfo($"1、查询主键{pKeyName}...");
-            var refTables = OracleHelper.GetRefKey(pKeyName, connStr);
+            var refTables = GetRefKey(pKeyName, connStr);
             if (string.IsNullOrEmpty(refTables.Item1))
             {
                 LogInfo("2.1、主键未被引用。");
-                var res = OracleHelper.TruncateTable(tableName, connStr);
+                var res = TruncateTable(tableName, connStr);
                 if (res == -1)
                 {
                     LogInfo($"{tableName}表数据已删除");
@@ -119,7 +339,7 @@ namespace TruncateATable
                 foreach (var item in refTables.Item2)
                 {
                     LogInfo($"查询{item}数据记录。");
-                    var itemCount = OracleHelper.GetDataCount(item, connStr);
+                    var itemCount = GetDataCount(item, connStr);
                     LogInfo($"{item}count{itemCount}条数据记录。");
                     if (itemCount != 0)
                     {
@@ -149,7 +369,7 @@ namespace TruncateATable
                     int disableAccumulator = 0;
                     foreach (var item in refTables.Item2)
                     {
-                        var fKeyName = OracleHelper.GetForeignKey(item, pKeyName, connStr);
+                        var fKeyName = GetForeignKey(item, pKeyName, connStr);
                         if (string.IsNullOrEmpty(fKeyName))
                         {
                             LogInfo("Error:出现意料之外的异常");
@@ -158,7 +378,7 @@ namespace TruncateATable
                         else
                         {
                             LogInfo($"禁用表{item}的外键{fKeyName}。");
-                            int res = OracleHelper.GetDisableForeignKey(item, fKeyName, connStr);
+                            int res = GetDisableForeignKey(item, fKeyName, connStr);
                             if (res == -1)
                             {
                                 LogInfo($"禁用表{item}的外键{fKeyName}成功。");
@@ -176,7 +396,7 @@ namespace TruncateATable
                     {
                         LogInfo($"禁用表{tableName}对表{refTables.Item1}的外键 成功。");
                         LogInfo($"执行删除计划");
-                        var i = OracleHelper.TruncateTable(tableName, connStr);
+                        var i = TruncateTable(tableName, connStr);
                         if (i == -1)
                         {
                             LogInfo($"表{tableName}删除计划执行成功");
@@ -184,7 +404,7 @@ namespace TruncateATable
                             int enableAccumulator = 0;
                             foreach (var item in refTables.Item2)
                             {
-                                var fKeyName = OracleHelper.GetForeignKey(item, pKeyName, connStr);
+                                var fKeyName = GetForeignKey(item, pKeyName, connStr);
                                 if (string.IsNullOrEmpty(fKeyName))
                                 {
                                     LogInfo("Error:出现意料之外的异常");
@@ -193,7 +413,7 @@ namespace TruncateATable
                                 else
                                 {
                                     LogInfo($"启用表{item}的外键{fKeyName}。");
-                                    int res = OracleHelper.GetEnabledForeignKey(item, fKeyName, connStr);
+                                    int res = GetEnabledForeignKey(item, fKeyName, connStr);
                                     if (res == -1)
                                     {
                                         LogInfo($"启用表{item}的外键{fKeyName}成功。");
