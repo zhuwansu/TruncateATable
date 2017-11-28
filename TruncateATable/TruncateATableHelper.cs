@@ -66,12 +66,6 @@ namespace TruncateATable
 
         #endregion
 
-        #region Common-ExecuteSql
-
-
-
-        #endregion
-
         #region Core
 
         /// <summary>
