@@ -2,6 +2,10 @@
 - 针对数据库 Oracle 快速删除一个表关联链上的所有表的所有数据。即可删除该表的数据及其关联表的数据，如果其关联表自己仍有关联表的话也会被清空数据，再往下亦是如此。
 - 是对 truncate 语句的扩展，truncate 语句无法对引用表执行删除操作。
 
+## 包
+
+[TruncateATable](https://www.nuget.org/packages/TruncateATable/)  [![TruncateATable](https://img.shields.io/nuget/vpre/TruncateATable.svg)](https://www.nuget.org/packages/TruncateATable/) | [![TruncateATable](https://img.shields.io/nuget/dt/TruncateATable.svg)](https://www.nuget.org/packages/TruncateATable/) 
+
 ## 快速开始
 
 > **安装**
