@@ -4,7 +4,8 @@
 
 ## 包
 
-[TruncateATable](https://www.nuget.org/packages/TruncateATable/)  [![TruncateATable](https://img.shields.io/nuget/vpre/TruncateATable.svg)](https://www.nuget.org/packages/TruncateATable/) | [![TruncateATable](https://img.shields.io/nuget/dt/TruncateATable.svg)](https://www.nuget.org/packages/TruncateATable/) 
+[TruncateATable]
+[![TruncateATable](https://img.shields.io/nuget/vpre/TruncateATable.svg)](https://www.nuget.org/packages/TruncateATable/) | [![TruncateATable](https://img.shields.io/nuget/dt/TruncateATable.svg)](https://www.nuget.org/packages/TruncateATable/) 
 
 ## 快速开始
 
